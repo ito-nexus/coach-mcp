@@ -1,0 +1,29 @@
+# Portainer stack: coach-mcp
+# Deploy with Portainer > Stacks > Add stack > Repository (this repo), or build on the droplet.
+# Set the environment variables in Portainer (see .env.example). Nothing secret goes in this file.
+services:
+  coach-mcp:
+    build: .
+    image: coach-mcp:latest
+    container_name: coach-mcp
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8787:8787"   # only reachable from the droplet; Nginx Proxy Manager forwards to it
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL}
+      PORT: "8787"
+      TRUST_PROXY: "2"            # Cloudflare + Nginx Proxy Manager
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      EMBED_MODEL: text-embedding-3-small
+      CONNECT_PASSWORD: ${CONNECT_PASSWORD}
+      TOKEN_SECRET: ${TOKEN_SECRET}
+      MCP_API_KEY: ${MCP_API_KEY}
+      DATA_DIR: /data
+    volumes:
+      - coach_mcp_data:/data      # keeps people signed in across restarts
+    mem_limit: 256m
+
+volumes:
+  coach_mcp_data:
